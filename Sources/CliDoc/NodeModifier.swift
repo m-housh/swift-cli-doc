@@ -9,10 +9,10 @@ public protocol NodeModifier {
 }
 
 public extension NodeModifier {
-  func modifier<T: NodeModifier>(
+  func concat<T: NodeModifier>(
     _ modifier: T
-  ) -> ModifiedNode<Self, T> where T.Content == Body {
-    .init(content: self, modifier: modifier)
+  ) -> ConcatModifier<Content, Self, T> {
+    ConcatModifier(first: self, second: modifier)
   }
 }
 
@@ -21,6 +21,19 @@ public extension Node {
   func modifier<T: NodeModifier>(_ modifier: T) -> ModifiedNode<Self, T> {
     .init(content: self, modifier: modifier)
   }
+}
+
+public struct ConcatModifier<Content, Modifier1, Modifier2>: NodeModifier where Content: Node,
+  Modifier1: NodeModifier, Modifier2: NodeModifier,
+  Modifier1.Content == Content, Modifier1.Body == Modifier2.Content
+{
+  let first: Modifier1
+  let second: Modifier2
+
+  public func render(content: Content) -> some Node {
+    second.render(content: first.render(content: content))
+  }
+
 }
 
 public struct ModifiedNode<Content, Modifier> {
@@ -56,4 +69,12 @@ extension ModifiedNode: NodeModifier where
     let body = content.body
     return modifier.render(content: body).render()
   }
+}
+
+extension ModifiedNode where Modifier: NodeModifier {
+
+  func modifier<T: NodeModifier>(_ modifier: T) -> ModifiedNode<Content, ConcatModifier<Content, Modifier, T>> {
+    .init(content: content, modifier: self.modifier.concat(modifier))
+  }
+
 }
