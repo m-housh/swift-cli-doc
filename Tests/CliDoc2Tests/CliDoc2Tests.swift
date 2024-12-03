@@ -12,20 +12,24 @@ let setupRainbow: Bool = {
 func testGroup() {
   #expect(setupRainbow)
   let group = Group {
-    Label { "Foo:" }.color(.blue)
+    Label { "Foo:" }
     "Bar"
     "Baz"
     Note { "Bang:" } content: { "boom" }
     if setupRainbow {
       Label("Hello, rainbow").color(.blue)
     } else {
-      Label("No color for you!").color(.green)
+      Label("No color for you!").color(.red)
     }
-  }.color(.green)
+  }
+  .color(.green)
+  .style(.italic)
+  .labelStyle(color: .blue, styles: .bold)
 
+  print(type(of: group))
   print(group.render())
 
-  let note = Note { "Bang:" } content: { "boom" }
-  print(note.render())
-  print(type(of: note.label))
+//   let note = Note { "Bang:" } content: { "boom" }
+//   print(note.render())
+//   print(type(of: note.label))
 }
