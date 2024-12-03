@@ -41,7 +41,7 @@ func checkLabelColorModifier() {
     }
   }
   .labelColor(.blue)
-  // .labelColor(.green)
+
   print(type(of: group))
   print(type(of: group.body))
 
@@ -52,6 +52,13 @@ func checkLabelColorModifier() {
   \("Bang".green) boom
   """
   #expect(group.render() == expected)
+
+//   var foo = group
+//   if var bar = group as? ModifiedNode<Group, GroupLabelModifier> {
+//     print("Modified Node")
+//     bar.modifier = bar.modifier.concat(GroupLabelModifier(color: .green))
+//     print(type(of: bar.body))
+//   }
 }
 
 @Test
