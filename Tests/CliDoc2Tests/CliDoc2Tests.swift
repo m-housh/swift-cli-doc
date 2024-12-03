@@ -24,7 +24,6 @@ func testGroup() {
   }
   .color(.green)
   .style(.italic)
-  .labelStyle(color: .blue, styles: .bold)
 
   print(type(of: group))
   print(group.render())

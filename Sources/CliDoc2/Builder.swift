@@ -42,10 +42,10 @@ public enum EitherNode<N: TextNode, N1: TextNode>: TextNode {
   case first(N)
   case second(N1)
 
-  public func render() -> String {
+  public var body: some TextNode {
     switch self {
-    case let .first(node): return node.render()
-    case let .second(node): return node.render()
+    case let .first(node): return node.eraseToAnyTextNode()
+    case let .second(node): return node.eraseToAnyTextNode()
     }
   }
 }
@@ -67,7 +67,7 @@ public struct NodeContainer: TextNode {
   }
 
   @inlinable
-  public func render() -> String {
+  public var body: some TextNode {
     nodes.reduce("") { $0 + $1.render() }
   }
 }

@@ -15,7 +15,6 @@ public protocol NodeModifier {
 public extension NodeModifier {
 
   func concat<T: NodeModifier>(_ modifier: T) -> ConcatModifier<Self, T> {
-    print("Concat: \(type(of: modifier))")
     return .init(firstModifier: self, secondModifier: modifier)
   }
 }
@@ -45,14 +44,19 @@ public struct ModifiedNode<Content: TextNode, Modifier: NodeModifier> {
 }
 
 extension ModifiedNode: TextNode where Modifier.Content == Content {
-  public func render() -> String {
-    modifier.render(content: content).render()
+  public var body: some TextNode {
+    modifier.render(content: content)
   }
 
   @inlinable
   func apply<M: NodeModifier>(_ modifier: M) -> ModifiedNode<Content, ConcatModifier<Modifier, M>> {
-    print("ModifiedNode modifier called.")
     return .init(content: content, modifier: self.modifier.concat(modifier))
+  }
+}
+
+extension ModifiedNode: NodeRepresentable where Self: TextNode {
+  public func render() -> String {
+    body.render()
   }
 }
 
@@ -60,59 +64,5 @@ public extension TextNode {
   @inlinable
   func modifier<M: NodeModifier>(_ modifier: M) -> ModifiedNode<Self, M> {
     .init(content: self, modifier: modifier)
-  }
-}
-
-@usableFromInline
-struct ColorModifier<Content: TextNode>: NodeModifier {
-  @usableFromInline
-  let color: NamedColor
-
-  @usableFromInline
-  init(color: NamedColor) {
-    self.color = color
-  }
-
-  @usableFromInline
-  func render(content: Content) -> some TextNode {
-    content.render().applyingColor(color)
-  }
-}
-
-public extension TextNode {
-  @inlinable
-  func color(_ color: NamedColor) -> some TextNode {
-    modifier(ColorModifier(color: color))
-  }
-}
-
-@usableFromInline
-struct StyleModifier<Content: TextNode>: NodeModifier {
-
-  @usableFromInline
-  let styles: [Style]
-
-  @usableFromInline
-  init(styles: [Style]) {
-    self.styles = styles
-  }
-
-  @usableFromInline
-  func render(content: Content) -> some TextNode {
-    styles.reduce(content.render()) {
-      $0.applyingStyle($1)
-    }
-  }
-}
-
-public extension TextNode {
-  @inlinable
-  func style(_ styles: Style...) -> some TextNode {
-    modifier(StyleModifier(styles: styles))
-  }
-
-  @inlinable
-  func style(_ styles: [Style]) -> some TextNode {
-    modifier(StyleModifier(styles: styles))
   }
 }
