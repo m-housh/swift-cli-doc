@@ -45,7 +45,7 @@ func testVStack() {
 @Test
 func testNote() {
   #expect(setupRainbow)
-  let note = Note(content: "Some note.").noteStyle(.default)
+  let note = Note(content: "Some note.")
   let expected = """
   \("NOTE:".yellow.bold) Some note.
   """
@@ -55,7 +55,7 @@ func testNote() {
 @Test
 func testExamples() {
   #expect(setupRainbow)
-  let examples = Examples(
+  let examples = ExampleSection(
     examples: [("First", "ls -lah"), ("Second", "find . -name foo")]
   )
 
@@ -69,4 +69,37 @@ func testExamples() {
   $ \("find . -name foo".italic)
   """
   #expect(examples.render() == expected)
+}
+
+@Test
+func testExamplesWithCustomExampleOnlyStyle() {
+  #expect(setupRainbow)
+  let examples = ExampleSection(
+    examples: [("First", "ls -lah"), ("Second", "find . -name foo")]
+  )
+  .exampleStyle(CustomExampleOnlyStyle())
+
+  let expected = """
+  \("Examples:".yellow.bold) Some common usage examples.
+
+  \("First".red)
+  $ \("ls -lah".italic)
+
+  \("Second".red)
+  $ \("find . -name foo".italic)
+  """
+  #expect(examples.render() == expected)
+}
+
+struct CustomExampleOnlyStyle: ExampleStyle {
+  func render(content: ExampleConfiguration) -> some TextNode {
+    VStack(spacing: 2) {
+      content.examples.map { example in
+        VStack {
+          Label(example.label.red)
+          ShellCommand { example.example }
+        }
+      }
+    }
+  }
 }

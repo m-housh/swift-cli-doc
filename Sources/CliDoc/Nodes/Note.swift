@@ -18,10 +18,7 @@ public struct Note<Label: TextNode, Content: TextNode>: TextNode {
 
   @inlinable
   public var body: some TextNode {
-    HStack {
-      label
-      content
-    }
+    noteStyle(.default)
   }
 }
 

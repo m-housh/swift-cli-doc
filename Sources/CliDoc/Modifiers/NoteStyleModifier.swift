@@ -23,7 +23,7 @@ public struct DefaultNoteStyle: NoteStyleModifier {
 
   public func render(content: NoteStyleConfiguration) -> some TextNode {
     HStack {
-      content.label.color(.yellow).style(.bold)
+      content.label.color(.yellow).textStyle(.bold)
       content.content
     }
   }

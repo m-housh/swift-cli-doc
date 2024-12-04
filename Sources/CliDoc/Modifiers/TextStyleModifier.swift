@@ -2,12 +2,12 @@ import Rainbow
 
 public extension TextNode {
   @inlinable
-  func style(_ styles: Style...) -> some TextNode {
+  func textStyle(_ styles: Style...) -> some TextNode {
     modifier(StyleModifier(styles: styles))
   }
 
   @inlinable
-  func style(_ styles: [Style]) -> some TextNode {
+  func textStyle(_ styles: [Style]) -> some TextNode {
     modifier(StyleModifier(styles: styles))
   }
 }

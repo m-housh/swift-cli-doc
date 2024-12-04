@@ -26,7 +26,7 @@ public struct LabelStyle<C: TextNode>: NodeModifier {
   @inlinable
   public func render(content: Label<C>) -> some TextNode {
     var label: any TextNode = content.content
-    label = label.style(styles)
+    label = label.textStyle(styles)
     if let color {
       label = label.color(color)
     }

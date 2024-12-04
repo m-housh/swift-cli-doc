@@ -1,6 +1,6 @@
 import Rainbow
 
-public struct Examples<Header: TextNode, Label: TextNode>: TextNode {
+public struct ExampleSection<Header: TextNode, Label: TextNode>: TextNode {
   public typealias Example = (label: String, example: String)
 
   @usableFromInline
@@ -25,24 +25,11 @@ public struct Examples<Header: TextNode, Label: TextNode>: TextNode {
 
   @inlinable
   public var body: some TextNode {
-    VStack(spacing: 2) {
-      HStack {
-        header
-        label
-      }
-      VStack(spacing: 2) {
-        self.examples.map { example in
-          VStack {
-            CliDoc.Label(example.label.green.bold)
-            ShellCommand { example.example.italic }
-          }
-        }
-      }
-    }
+    style(.default())
   }
 }
 
-public extension Examples where Header == String, Label == String {
+public extension ExampleSection where Header == String, Label == String {
   @inlinable
   init(
     header: String = "Examples:".yellow.bold,
