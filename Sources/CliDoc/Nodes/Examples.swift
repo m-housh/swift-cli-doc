@@ -12,6 +12,7 @@ public struct Examples<Header: TextNode, Label: TextNode>: TextNode {
   @usableFromInline
   let label: Label
 
+  @inlinable
   public init(
     examples: [Example],
     @TextBuilder header: () -> Header,
@@ -22,19 +23,42 @@ public struct Examples<Header: TextNode, Label: TextNode>: TextNode {
     self.label = label()
   }
 
+  @inlinable
   public var body: some TextNode {
-    Group(separator: "") {
-      Group(separator: " ", content: [header.color(.yellow).style(.bold), label, "\n"])
-      "\n"
-      Group(
-        separator: "\n\n",
-        content: self.examples.map { example in
-          Group(separator: "\n") {
+    VStack(spacing: 2) {
+      HStack {
+        header
+        label
+      }
+      VStack(spacing: 2) {
+        self.examples.map { example in
+          VStack {
             CliDoc.Label(example.label.green.bold)
             ShellCommand { example.example.italic }
           }
         }
-      )
+      }
     }
   }
+}
+
+public extension Examples where Header == String, Label == String {
+  @inlinable
+  init(
+    header: String = "Examples:".yellow.bold,
+    label: String = "Some common usage examples.",
+    examples: [Example]
+  ) {
+    self.init(examples: examples) { header } label: { label }
+  }
+
+  @inlinable
+  init(
+    header: String = "Examples:".yellow.bold,
+    label: String = "Some common usage examples.",
+    examples: Example...
+  ) {
+    self.init(header: header, label: label, examples: examples)
+  }
+
 }

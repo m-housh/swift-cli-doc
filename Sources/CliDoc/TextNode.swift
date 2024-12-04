@@ -59,3 +59,15 @@ extension Optional: NodeRepresentable where Wrapped: NodeRepresentable {
     return node.render()
   }
 }
+
+extension Array: TextNode where Element: TextNode {
+  public var body: some TextNode {
+    NodeContainer(nodes: self)
+  }
+}
+
+extension Array: NodeRepresentable where Element: NodeRepresentable {
+  public func render() -> String {
+    map { $0.render() }.joined()
+  }
+}

@@ -6,7 +6,7 @@ public protocol NodeModifier {
   typealias Body = _Body
   // swiftlint:enable type_name
 
-  associatedtype Content: TextNode
+  associatedtype Content
 
   @TextBuilder
   func render(content: Content) -> Body

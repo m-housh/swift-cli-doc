@@ -15,7 +15,11 @@ public struct ShellCommand<Content: TextNode>: TextNode {
     self.content = content()
   }
 
+  @inlinable
   public var body: some TextNode {
-    Group(separator: " ", content: [symbol, content])
+    HStack {
+      symbol
+      content
+    }
   }
 }

@@ -2,6 +2,7 @@
 @preconcurrency import Rainbow
 import Testing
 
+// Ensure that rainbow is setup, for test comparisons to work properly.
 let setupRainbow: Bool = {
   Rainbow.enabled = true
   Rainbow.outputTarget = .console
@@ -12,31 +13,60 @@ let setupRainbow: Bool = {
 func testGroup() {
   #expect(setupRainbow)
   let group = Group {
-    Label { "Foo:" }
-    "Bar"
-    "Baz"
-    Note { "Bang:" } content: { "boom" }
-    if setupRainbow {
-      Label("Hello, rainbow").color(.blue)
-    } else {
-      Label("No color for you!").color(.red)
-    }
+    "foo"
+    "bar"
   }
-  .color(.green)
-  .style(.italic)
+  #expect(group.render() == "foobar")
+}
 
-  print(type(of: group))
-  print(group.render())
+@Test
+func testHStack() {
+  #expect(setupRainbow)
+  let stack = HStack {
+    "foo"
+    "bar"
+  }
+  #expect(stack.render() == "foo bar")
+}
 
-//   let note = Note { "Bang:" } content: { "boom" }
-//   print(note.render())
-//   print(type(of: note.label))
+@Test
+func testVStack() {
+  #expect(setupRainbow)
+  let stack = VStack {
+    "foo"
+    "bar"
+  }
+  #expect(stack.render() == """
+  foo
+  bar
+  """)
+}
+
+@Test
+func testNote() {
+  #expect(setupRainbow)
+  let note = Note(content: "Some note.").noteStyle(.default)
+  let expected = """
+  \("NOTE:".yellow.bold) Some note.
+  """
+  #expect(note.render() == expected)
 }
 
 @Test
 func testExamples() {
   #expect(setupRainbow)
-  let examples = Examples(examples: [("First", "ls -lah"), ("Second", "find . -name foo")], header: { "Examples:" }, label: { "Common examples." })
+  let examples = Examples(
+    examples: [("First", "ls -lah"), ("Second", "find . -name foo")]
+  )
 
-  print(examples.render())
+  let expected = """
+  \("Examples:".yellow.bold) Some common usage examples.
+
+  \("First".green.bold)
+  $ \("ls -lah".italic)
+
+  \("Second".green.bold)
+  $ \("find . -name foo".italic)
+  """
+  #expect(examples.render() == expected)
 }
