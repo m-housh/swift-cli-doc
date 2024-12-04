@@ -1,31 +1,58 @@
-public struct Note<Label: Node, Content: Node>: Node {
+import Rainbow
 
-  var separator: String
-  var label: Label
-  var content: Content
+public struct Note<Label: TextNode, Content: TextNode>: TextNode {
+  @usableFromInline
+  let label: Label
 
+  @usableFromInline
+  let content: Content
+
+  @usableFromInline
+  var separator: any TextNode = " "
+
+  @inlinable
   public init(
-    separator: String = " ",
-    @NodeBuilder label: () -> Label,
-    @NodeBuilder content: () -> Content
+    separator: any TextNode = " ",
+    @TextBuilder _ label: () -> Label,
+    @TextBuilder content: () -> Content
   ) {
     self.separator = separator
     self.label = label()
     self.content = content()
   }
 
-  public var body: some Node {
-    Group([label, content], separator: separator)
+  @inlinable
+  public var body: some TextNode {
+    Group(separator: separator, content: [label, content])
   }
 }
 
-public extension Note where Label == CliDoc.Label {
+public extension Note where Label == String {
 
+  @inlinable
   init(
-    separator: String = " ",
-    label: String = "NOTE:",
-    @NodeBuilder content: () -> Content
+    separator: any TextNode = " ",
+    _ label: String = "NOTE:".yellow.bold,
+    @TextBuilder content: () -> Content
   ) {
-    self.init(separator: separator, label: { CliDoc.Label(label) }, content: content)
+    self.separator = separator
+    self.label = label
+    self.content = content()
+  }
+
+  static func important(
+    separator: any TextNode = " ",
+    _ label: String = "IMPORTANT NOTE:".red.underline,
+    @TextBuilder content: () -> Content
+  ) -> Self {
+    self.init(separator: separator, label, content: content)
+  }
+
+  static func seeAlso(
+    separator: any TextNode = " ",
+    _ label: String = "SEE ALSO:".yellow.bold,
+    @TextBuilder content: () -> Content
+  ) -> Self {
+    self.init(separator: separator, label, content: content)
   }
 }

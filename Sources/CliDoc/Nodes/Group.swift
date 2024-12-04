@@ -1,28 +1,41 @@
-/// A group container holding one or more nodes.
-public struct Group: Node {
-  var nodes: [any Node]
-  var separator: String
+public struct Group: TextNode {
+  @usableFromInline
+  var content: [any TextNode]
 
-  init(_ nodes: [any Node], separator: String = "\n") {
-    self.nodes = nodes
+  @usableFromInline
+  var separator: any TextNode
+
+  @inlinable
+  public init(
+    separator: any TextNode = "\n",
+    content: [any TextNode]
+  ) {
+    self.content = content
     self.separator = separator
   }
 
+  @inlinable
   public init(
-    separator: String = " ",
-    @NodeBuilder build: () -> any Node
+    separator: any TextNode = "\n",
+    @TextBuilder content: () -> any TextNode
   ) {
-    let node = build()
-    if var group = node as? Self {
-      group.separator = separator
-      self = group
+    // Check if the content is a NodeContainer, typically is when
+    // using the TextBuilder with more than one text node.
+    //
+    // We need to take over the contents, so we can control the separator.
+    let content = content()
+    if let many = content as? NodeContainer {
+      self.content = many.nodes
     } else {
-      self.init([node], separator: separator)
+      // We didn't get a NodeContainer, so fallback to just storing
+      // the content.
+      self.content = [content]
     }
+    self.separator = separator
   }
 
-  public var body: some Node {
-    nodes.map { $0.render() }.joined(separator: separator)
+  @inlinable
+  public var body: some TextNode {
+    content.map { $0.render() }.joined(separator: separator.render())
   }
-
 }

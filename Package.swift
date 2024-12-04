@@ -17,19 +17,9 @@ let package = Package(
         .product(name: "Rainbow", package: "Rainbow")
       ]
     ),
-    .target(
-      name: "CliDoc2",
-      dependencies: [
-        .product(name: "Rainbow", package: "Rainbow")
-      ]
-    ),
     .testTarget(
       name: "CliDocTests",
       dependencies: ["CliDoc"]
-    ),
-    .testTarget(
-      name: "CliDoc2Tests",
-      dependencies: ["CliDoc2"]
     )
   ]
 )

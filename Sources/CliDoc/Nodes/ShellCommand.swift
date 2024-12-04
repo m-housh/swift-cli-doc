@@ -1,20 +1,21 @@
-public struct ShellCommand<Content: Node>: Node {
+public struct ShellCommand<Content: TextNode>: TextNode {
 
-  public var symbol: String
-  public var content: Content
+  @usableFromInline
+  var symbol: any TextNode
 
+  @usableFromInline
+  var content: Content
+
+  @inlinable
   public init(
-    symbol: String = "$",
-    @NodeBuilder content: () -> Content
+    symbol: any TextNode = "$",
+    @TextBuilder content: () -> Content
   ) {
     self.symbol = symbol
     self.content = content()
   }
 
-  public var body: some Node {
-    Group(separator: " ") {
-      symbol
-      content
-    }
+  public var body: some TextNode {
+    Group(separator: " ", content: [symbol, content])
   }
 }

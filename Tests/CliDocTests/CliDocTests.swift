@@ -9,65 +9,34 @@ let setupRainbow: Bool = {
 }()
 
 @Test
-func checkStringBuilder() {
+func testGroup() {
+  #expect(setupRainbow)
   let group = Group {
-    Label("foo:")
-    "bar"
-  }
-
-  #expect(group.render() == "foo: bar")
-
-  #expect(setupRainbow)
-  let coloredLabel = group.labelColor(.green)
-  #expect(
-    coloredLabel.render() == """
-    \("foo:".green) bar
-    """)
-}
-
-@Test
-func checkLabelColorModifier() {
-  #expect(setupRainbow)
-  let group = Group(separator: "\n") {
-    Label("Foo:")
-    Group(separator: "\n") {
-      "Bar"
-      Label("baz:")
-      Group {
-        Label("Bang")
-        "boom"
-      }
-      .labelColor(.green)
+    Label { "Foo:" }
+    "Bar"
+    "Baz"
+    Note { "Bang:" } content: { "boom" }
+    if setupRainbow {
+      Label("Hello, rainbow").color(.blue)
+    } else {
+      Label("No color for you!").color(.red)
     }
   }
-  .labelColor(.blue)
+  .color(.green)
+  .style(.italic)
 
   print(type(of: group))
-  print(type(of: group.body))
+  print(group.render())
 
-  let expected = """
-  \("Foo:".blue)
-  Bar
-  \("baz:".blue)
-  \("Bang".green) boom
-  """
-  #expect(group.render() == expected)
-
-//   var foo = group
-//   if var bar = group as? ModifiedNode<Group, GroupLabelModifier> {
-//     print("Modified Node")
-//     bar.modifier = bar.modifier.concat(GroupLabelModifier(color: .green))
-//     print(type(of: bar.body))
-//   }
+//   let note = Note { "Bang:" } content: { "boom" }
+//   print(note.render())
+//   print(type(of: note.label))
 }
 
 @Test
-func checkNote() {
+func testExamples() {
   #expect(setupRainbow)
-  let note = Note {
-    "My note..."
-  }
-  .labelColor(.yellow)
+  let examples = Examples(examples: [("First", "ls -lah"), ("Second", "find . -name foo")], header: { "Examples:" }, label: { "Common examples." })
 
-  #expect(note.render() == "\("NOTE:".yellow) My note...")
+  print(examples.render())
 }

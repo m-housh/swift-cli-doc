@@ -1,73 +1,68 @@
+import Rainbow
+
 public protocol NodeModifier {
-  associatedtype Body: Node
   // swiftlint:disable type_name
-  associatedtype _Content: Node
-  typealias Content = _Content
+  associatedtype _Body: TextNode
+  typealias Body = _Body
   // swiftlint:enable type_name
 
+  associatedtype Content: TextNode
+
+  @TextBuilder
   func render(content: Content) -> Body
 }
 
 public extension NodeModifier {
-  func concat<T: NodeModifier>(
-    _ modifier: T
-  ) -> ConcatModifier<Content, Self, T> {
-    ConcatModifier(first: self, second: modifier)
+
+  func concat<T: NodeModifier>(_ modifier: T) -> ConcatModifier<Self, T> {
+    return .init(firstModifier: self, secondModifier: modifier)
   }
 }
 
-public extension Node {
-  func modifier<T: NodeModifier>(_ modifier: T) -> ModifiedNode<Self, T> {
-    .init(content: self, modifier: modifier)
+public struct ConcatModifier<M0: NodeModifier, M1: NodeModifier>: NodeModifier where M1.Content == M0.Body {
+  let firstModifier: M0
+  let secondModifier: M1
+
+  public func render(content: M0.Content) -> some TextNode {
+    let firstOutput = firstModifier.render(content: content)
+    return secondModifier.render(content: firstOutput)
   }
 }
 
-public struct ConcatModifier<Content, Modifier1, Modifier2>: NodeModifier where
-  Content: Node,
-  Modifier1: NodeModifier,
-  Modifier2: NodeModifier,
-  Modifier1.Content == Content,
-  Modifier1.Body == Modifier2.Content
-{
-  let first: Modifier1
-  let second: Modifier2
+public struct ModifiedNode<Content: TextNode, Modifier: NodeModifier> {
+  @usableFromInline
+  let content: Content
 
-  public func render(content: Content) -> some Node {
-    second.render(content: first.render(content: content))
+  @usableFromInline
+  let modifier: Modifier
+
+  @usableFromInline
+  init(content: Content, modifier: Modifier) {
+    self.content = content
+    self.modifier = modifier
   }
 }
 
-public struct ModifiedNode<Content, Modifier> {
-  var content: Content
-  var modifier: Modifier
+extension ModifiedNode: TextNode where Modifier.Content == Content {
+  public var body: some TextNode {
+    modifier.render(content: content)
+  }
+
+  @inlinable
+  func apply<M: NodeModifier>(_ modifier: M) -> ModifiedNode<Content, ConcatModifier<Modifier, M>> {
+    return .init(content: content, modifier: self.modifier.concat(modifier))
+  }
 }
 
-extension ModifiedNode: NodeRepresentable where Content: NodeRepresentable,
-  Modifier: NodeModifier,
-  Modifier.Content == Content
-{
+extension ModifiedNode: NodeRepresentable where Self: TextNode {
   public func render() -> String {
-    modifier.render(content: content).render()
+    body.render()
   }
 }
 
-extension ModifiedNode: Node where Content: Node,
-  Modifier: NodeModifier,
-  Modifier.Content == Content
-{
-  public var body: Content {
-    content
-  }
-}
-
-extension ModifiedNode: NodeModifier where
-  Content: NodeModifier,
-  Modifier: NodeModifier,
-  Content.Body == Modifier.Content,
-  Content: Node
-{
-  public func render(content: Content) -> some Node {
-    let body = content.body
-    return modifier.render(content: body).render()
+public extension TextNode {
+  @inlinable
+  func modifier<M: NodeModifier>(_ modifier: M) -> ModifiedNode<Self, M> {
+    .init(content: self, modifier: modifier)
   }
 }
