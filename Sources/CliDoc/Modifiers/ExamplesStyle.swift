@@ -11,7 +11,7 @@ public extension ExampleSection {
   }
 
   func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
-    DefaultExamplesStyle().render(content: .init(
+    DefaultExamplesStyle(exampleStyle: style).render(content: .init(
       header: header,
       label: label,
       examples: examples
