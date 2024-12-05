@@ -57,25 +57,6 @@ public struct ExampleSectionConfiguration {
   }
 }
 
-// MARK: - Style
-
-public extension ExampleSection {
-
-  func style<S: ExampleSectionStyle>(_ style: S) -> some TextNode {
-    style.render(content: configuration)
-  }
-
-  func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
-    DefaultExamplesStyle(exampleStyle: style).render(content: configuration)
-  }
-}
-
-extension Array where Element == ExampleSection.Example {
-  func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
-    style.render(content: .init(examples: self))
-  }
-}
-
 public struct ExampleConfiguration {
   @usableFromInline
   let examples: [ExampleSection.Example]
@@ -86,12 +67,42 @@ public struct ExampleConfiguration {
   }
 }
 
+// MARK: - Style
+
 public protocol ExampleSectionStyle: NodeModifier where Content == ExampleSectionConfiguration {}
 public protocol ExampleStyle: NodeModifier where Content == ExampleConfiguration {}
 
-public extension ExampleSectionStyle where Self == DefaultExamplesStyle {
-  static func `default`(exampleStyle: any ExampleStyle = .default) -> Self {
-    DefaultExamplesStyle(exampleStyle: exampleStyle)
+public extension ExampleSection {
+
+  @inlinable
+  func style<S: ExampleSectionStyle>(_ style: S) -> some TextNode {
+    style.render(content: configuration)
+  }
+
+  @inlinable
+  func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
+    DefaultExampleSectionStyle(exampleStyle: style).render(content: configuration)
+  }
+}
+
+extension Array where Element == ExampleSection.Example {
+  @inlinable
+  func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
+    style.render(content: .init(examples: self))
+  }
+}
+
+public extension ExampleSectionStyle {
+  @inlinable
+  static func `default`<S: ExampleStyle>(exampleStyle: S) -> DefaultExampleSectionStyle<S> {
+    DefaultExampleSectionStyle(exampleStyle: exampleStyle)
+  }
+}
+
+public extension ExampleSectionStyle where Self == DefaultExampleSectionStyle<DefaultExampleStyle> {
+  @inlinable
+  static func `default`() -> DefaultExampleSectionStyle<DefaultExampleStyle> {
+    DefaultExampleSectionStyle()
   }
 }
 
@@ -101,19 +112,21 @@ public extension ExampleStyle where Self == DefaultExampleStyle {
   }
 }
 
-public struct DefaultExamplesStyle: ExampleSectionStyle {
+public struct DefaultExampleSectionStyle<Style: ExampleStyle>: ExampleSectionStyle {
 
   @usableFromInline
-  let exampleStyle: any ExampleStyle
+  let exampleStyle: Style
 
   @inlinable
-  public init(exampleStyle: any ExampleStyle = .default) {
+  public init(exampleStyle: Style) {
     self.exampleStyle = exampleStyle
   }
 
   @inlinable
   public func render(content: ExampleSectionConfiguration) -> some TextNode {
-    VStack(spacing: 2) {
+    Section {
+      exampleStyle.render(content: .init(examples: content.examples))
+    } header: {
       HStack {
         content.title
           .color(.yellow)
@@ -122,13 +135,20 @@ public struct DefaultExamplesStyle: ExampleSectionStyle {
         content.label
           .textStyle(.italic)
       }
-      exampleStyle.render(content: .init(examples: content.examples))
     }
+  }
+}
+
+public extension DefaultExampleSectionStyle where Style == DefaultExampleStyle {
+  @inlinable
+  init() {
+    self.init(exampleStyle: .default)
   }
 }
 
 public struct DefaultExampleStyle: ExampleStyle {
 
+  @inlinable
   public func render(content: ExampleConfiguration) -> some TextNode {
     VStack(spacing: 2) {
       content.examples.map { example in

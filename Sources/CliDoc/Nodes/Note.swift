@@ -72,3 +72,34 @@ public extension Note where Label == String, Content == String {
     self.init(label, content: content)
   }
 }
+
+public struct NoteStyleConfiguration {
+  let label: any TextNode
+  let content: any TextNode
+}
+
+public extension Note {
+  func noteStyle<S: NoteStyleModifier>(_ modifier: S) -> some TextNode {
+    modifier.render(content: .init(label: label, content: content))
+  }
+}
+
+// MARK: - Style
+
+public protocol NoteStyleModifier: NodeModifier where Content == NoteStyleConfiguration {}
+
+public extension NoteStyleModifier where Self == DefaultNoteStyle {
+  static var `default`: Self {
+    DefaultNoteStyle()
+  }
+}
+
+public struct DefaultNoteStyle: NoteStyleModifier {
+
+  public func render(content: NoteStyleConfiguration) -> some TextNode {
+    HStack {
+      content.label.color(.yellow).textStyle(.bold)
+      content.content
+    }
+  }
+}

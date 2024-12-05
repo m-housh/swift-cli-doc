@@ -17,6 +17,8 @@ public extension TextNode {
   }
 }
 
+// MARK: - String
+
 extension String: NodeRepresentable {
   public func render() -> String {
     self
@@ -29,36 +31,28 @@ extension String: TextNode {
   }
 }
 
-public struct AnyTextNode: TextNode {
-  let makeString: () -> String
-
-  public init<N: TextNode>(_ node: N) {
-    self.makeString = node.render
-  }
-
-  public var body: some TextNode { makeString() }
-}
-
-public extension TextNode {
-  func eraseToAnyTextNode() -> AnyTextNode {
-    AnyTextNode(self)
-  }
-}
+// MARK: - Optional
 
 extension Optional: TextNode where Wrapped: TextNode {
+  @TextBuilder
   public var body: some TextNode {
-    guard let node = self else { return "".eraseToAnyTextNode() }
-    return node.eraseToAnyTextNode()
+    switch self {
+    case let .some(node):
+      node
+    case .none:
+      Empty()
+    }
   }
 }
 
-extension Optional: NodeRepresentable where Wrapped: NodeRepresentable {
+extension Optional: NodeRepresentable where Wrapped: NodeRepresentable, Wrapped: TextNode {
 
   public func render() -> String {
-    guard let node = self else { return "" }
-    return node.render()
+    body.render()
   }
 }
+
+// MARK: - Array
 
 extension Array: TextNode where Element: TextNode {
   public var body: some TextNode {
@@ -66,8 +60,8 @@ extension Array: TextNode where Element: TextNode {
   }
 }
 
-extension Array: NodeRepresentable where Element: NodeRepresentable {
+extension Array: NodeRepresentable where Element: NodeRepresentable, Element: TextNode {
   public func render() -> String {
-    map { $0.render() }.joined()
+    body.render()
   }
 }

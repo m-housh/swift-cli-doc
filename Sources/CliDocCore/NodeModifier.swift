@@ -12,24 +12,8 @@ public protocol NodeModifier {
   func render(content: Content) -> Body
 }
 
-public extension NodeModifier {
-
-  func concat<T: NodeModifier>(_ modifier: T) -> ConcatModifier<Self, T> {
-    return .init(firstModifier: self, secondModifier: modifier)
-  }
-}
-
-public struct ConcatModifier<M0: NodeModifier, M1: NodeModifier>: NodeModifier where M1.Content == M0.Body {
-  let firstModifier: M0
-  let secondModifier: M1
-
-  public func render(content: M0.Content) -> some TextNode {
-    let firstOutput = firstModifier.render(content: content)
-    return secondModifier.render(content: firstOutput)
-  }
-}
-
 public struct ModifiedNode<Content: TextNode, Modifier: NodeModifier> {
+
   @usableFromInline
   let content: Content
 
@@ -47,14 +31,10 @@ extension ModifiedNode: TextNode where Modifier.Content == Content {
   public var body: some TextNode {
     modifier.render(content: content)
   }
-
-  @inlinable
-  func apply<M: NodeModifier>(_ modifier: M) -> ModifiedNode<Content, ConcatModifier<Modifier, M>> {
-    return .init(content: content, modifier: self.modifier.concat(modifier))
-  }
 }
 
 extension ModifiedNode: NodeRepresentable where Self: TextNode {
+  @inlinable
   public func render() -> String {
     body.render()
   }

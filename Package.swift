@@ -5,6 +5,7 @@ import PackageDescription
 let package = Package(
   name: "swift-cli-doc",
   products: [
+    .library(name: "CliDocCore", targets: ["CliDocCore"]),
     .library(name: "CliDoc", targets: ["CliDoc"])
   ],
   dependencies: [
@@ -12,14 +13,25 @@ let package = Package(
   ],
   targets: [
     .target(
-      name: "CliDoc",
+      name: "CliDocCore",
       dependencies: [
         .product(name: "Rainbow", package: "Rainbow")
       ]
     ),
     .testTarget(
+      name: "CliDocCoreTests",
+      dependencies: ["CliDocCore"]
+    ),
+    .target(
+      name: "CliDoc",
+      dependencies: [
+        "CliDocCore",
+        .product(name: "Rainbow", package: "Rainbow")
+      ]
+    ),
+    .testTarget(
       name: "CliDocTests",
-      dependencies: ["CliDoc"]
+      dependencies: ["CliDocCore", "CliDoc"]
     )
   ]
 )
