@@ -130,10 +130,9 @@ public struct DefaultExampleSectionStyle<Style: ExampleStyle>: ExampleSectionSty
       HStack {
         content.title
           .color(.yellow)
-          .textStyle(.bold)
+          .bold()
 
-        content.label
-          .textStyle(.italic)
+        content.label.italic()
       }
     }
   }
