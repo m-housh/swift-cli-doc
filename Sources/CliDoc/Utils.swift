@@ -19,3 +19,18 @@ func seperator(_ separator: String, count: Int) -> any TextNode {
   }
   return output
 }
+
+extension Array where Element == (any TextNode) {
+
+  @usableFromInline
+  func removingEmptys() -> [String] {
+    compactMap { node in
+      let string = node.render()
+      if string == "" {
+        return nil
+      }
+      return string
+    }
+  }
+
+}

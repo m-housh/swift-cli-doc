@@ -17,6 +17,7 @@ public struct HStack: TextNode {
 
   @inlinable
   public var body: some TextNode {
-    content.map { $0.render() }.joined(separator: separator.render())
+    content.removingEmptys()
+      .joined(separator: separator.render())
   }
 }

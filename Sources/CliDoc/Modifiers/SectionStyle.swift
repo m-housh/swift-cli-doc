@@ -31,7 +31,7 @@ public struct DefaultSectionStyle: SectionStyle {
     VStack {
       content.header
       content.content
-      content.footer.textStyle(.italic)
+      content.footer
     }
   }
 }

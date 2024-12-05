@@ -56,11 +56,13 @@ func testNote() {
 func testExamples() {
   #expect(setupRainbow)
   let examples = ExampleSection(
+    "Examples:",
+    label: "Some common usage examples.",
     examples: [("First", "ls -lah"), ("Second", "find . -name foo")]
   )
 
   let expected = """
-  \("Examples:".yellow.bold) Some common usage examples.
+  \("Examples:".yellow.bold)\(" ")\("Some common usage examples.".italic)
 
   \("First".green.bold)
   $ \("ls -lah".italic)
@@ -68,19 +70,22 @@ func testExamples() {
   \("Second".green.bold)
   $ \("find . -name foo".italic)
   """
-  #expect(examples.render() == expected)
+  let result = printIfNotEqual(examples.render(), expected)
+  #expect(result)
 }
 
 @Test
 func testExamplesWithCustomExampleOnlyStyle() {
   #expect(setupRainbow)
   let examples = ExampleSection(
+    "Examples:",
+    label: "Some common usage examples.",
     examples: [("First", "ls -lah"), ("Second", "find . -name foo")]
   )
   .exampleStyle(CustomExampleOnlyStyle())
 
   let expected = """
-  \("Examples:".yellow.bold) Some common usage examples.
+  \("Examples:".applyingStyle(.bold).applyingColor(.yellow)) \("Some common usage examples.".italic)
 
   \("First".red)
   $ \("ls -lah".italic)
@@ -88,7 +93,73 @@ func testExamplesWithCustomExampleOnlyStyle() {
   \("Second".red)
   $ \("find . -name foo".italic)
   """
-  #expect(examples.render() == expected)
+  let result = printIfNotEqual(examples.render(), expected)
+  #expect(result)
+}
+
+@Test(
+  arguments: SectionArg.arguments
+)
+func testSection(arg: SectionArg) {
+  #expect(setupRainbow)
+  printIfNotEqual(arg.section.render(), arg.expected)
+  #expect(arg.section.render() == arg.expected)
+}
+
+struct SectionArg: @unchecked Sendable {
+  let section: any TextNode
+  let expected: String
+
+  static var arguments: [Self] {
+    [
+      .init(
+        section: Section {
+          "Header"
+        } content: {
+          "Content"
+        } footer: {
+          "Footer"
+        },
+        expected: """
+        Header
+        Content
+        Footer
+        """
+      ),
+      .init(
+        section: Section {
+          "Content"
+        } footer: {
+          "Footer"
+        },
+        expected: """
+        Content
+        Footer
+        """
+      ),
+      .init(
+        section: Section {
+          "Header"
+        } content: {
+          "Content"
+        },
+        expected: """
+        Header
+        Content
+        """
+      )
+    ]
+  }
+}
+
+@discardableResult
+func printIfNotEqual(_ lhs: String, _ rhs: String) -> Bool {
+  guard lhs == rhs else {
+    print(lhs)
+    print(rhs)
+    return false
+  }
+  return true
 }
 
 struct CustomExampleOnlyStyle: ExampleStyle {
@@ -96,7 +167,7 @@ struct CustomExampleOnlyStyle: ExampleStyle {
     VStack(spacing: 2) {
       content.examples.map { example in
         VStack {
-          Label(example.label.red)
+          example.label.red
           ShellCommand { example.example }
         }
       }
