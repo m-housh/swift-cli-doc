@@ -4,4 +4,5 @@ preview-documentation target="CliDoc":
     --disable-sandbox \
     preview-documentation \
     --target {{target}} \
-    --include-extended-types
+    --include-extended-types \
+    --enable-inherited-docs

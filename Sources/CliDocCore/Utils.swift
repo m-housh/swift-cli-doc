@@ -1,6 +1,6 @@
 @usableFromInline
 func array(from node: any TextNode) -> [any TextNode] {
-  if let container = node as? NodeContainer {
+  if let container = node as? _NodeContainer {
     return container.nodes
   } else if let array = node as? [any TextNode] {
     return array

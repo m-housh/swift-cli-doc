@@ -37,16 +37,11 @@
 ///
 /// print(mySection.render())
 /// ```
-/// **Note:** colored output / styling only shows in the terminal.
 ///
-/// ```bash
+/// _Below is an image of the output from the `mySection.render()` above._
 ///
-/// Awesome
+/// ![Custom section style image](section.png)
 ///
-/// My super awesome section
-///
-/// Note: this is super awesome
-/// ```
 public struct Section<Header: TextNode, Content: TextNode, Footer: TextNode>: TextNode {
 
   @usableFromInline
@@ -124,7 +119,8 @@ public extension Section {
   }
 }
 
-/// Holds the type-erased values of a ``Section``, used to style a section.
+/// Holds the type-erased values of a ``Section``, that can be used to create
+/// custom styling for a section.
 public struct SectionConfiguration {
   /// The type-erased header of a section.
   public let header: any TextNode
@@ -143,6 +139,9 @@ public struct SectionConfiguration {
   }
 }
 
+/// Used to declare a custom style for a ``Section``. Your custom section style
+/// must conform to this protocol.
+///
 public protocol SectionStyle: TextModifier where Content == SectionConfiguration {}
 
 public extension SectionStyle where Self == DefaultSectionStyle {

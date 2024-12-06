@@ -1,8 +1,14 @@
-public protocol NodeRepresentable {
+/// A type that can produce a string to be used as a documentation
+/// text node.
+public protocol TextNodeRepresentable {
+
+  /// Produces the string output to use as the documentation string.
   func render() -> String
 }
 
-public protocol TextNode: NodeRepresentable {
+/// A type that can produce a string to be used as a documentation
+/// text node.
+public protocol TextNode: TextNodeRepresentable {
   // swiftlint:disable type_name
   associatedtype _Body: TextNode
   typealias Body = _Body
@@ -19,16 +25,12 @@ public extension TextNode {
 
 // MARK: - String
 
-extension String: NodeRepresentable {
-  public func render() -> String {
-    self
-  }
+extension String: TextNodeRepresentable {
+  public func render() -> String { self }
 }
 
 extension String: TextNode {
-  public var body: some TextNode {
-    self
-  }
+  public var body: some TextNode { self }
 }
 
 // MARK: - Optional
@@ -45,7 +47,7 @@ extension Optional: TextNode where Wrapped: TextNode {
   }
 }
 
-extension Optional: NodeRepresentable where Wrapped: NodeRepresentable, Wrapped: TextNode {
+extension Optional: TextNodeRepresentable where Wrapped: TextNodeRepresentable, Wrapped: TextNode {
 
   public func render() -> String {
     body.render()
@@ -56,11 +58,11 @@ extension Optional: NodeRepresentable where Wrapped: NodeRepresentable, Wrapped:
 
 extension Array: TextNode where Element: TextNode {
   public var body: some TextNode {
-    NodeContainer(nodes: self)
+    _NodeContainer(nodes: self)
   }
 }
 
-extension Array: NodeRepresentable where Element: NodeRepresentable, Element: TextNode {
+extension Array: TextNodeRepresentable where Element: TextNodeRepresentable, Element: TextNode {
   public func render() -> String {
     body.render()
   }

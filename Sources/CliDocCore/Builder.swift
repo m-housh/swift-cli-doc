@@ -1,3 +1,6 @@
+/// A result builder for creating ``TextNode`` types, similar to how
+/// `ViewBuilder` works in `SwiftUI`.
+///
 @resultBuilder
 public enum TextBuilder {
 
@@ -7,27 +10,27 @@ public enum TextBuilder {
   }
 
   @inlinable
-  public static func buildPartialBlock<N0: TextNode, N1: TextNode>(accumulated: N0, next: N1) -> NodeContainer {
+  public static func buildPartialBlock<N0: TextNode, N1: TextNode>(accumulated: N0, next: N1) -> _NodeContainer {
     .init(nodes: [accumulated, next])
   }
 
   @inlinable
-  public static func buildArray<N: TextNode>(_ components: [N]) -> NodeContainer {
+  public static func buildArray<N: TextNode>(_ components: [N]) -> _NodeContainer {
     .init(nodes: components)
   }
 
   @inlinable
-  public static func buildBlock<N: TextNode>(_ components: N...) -> NodeContainer {
+  public static func buildBlock<N: TextNode>(_ components: N...) -> _NodeContainer {
     .init(nodes: components)
   }
 
   @inlinable
-  public static func buildEither<N: TextNode, N1: TextNode>(first component: N) -> EitherNode<N, N1> {
+  public static func buildEither<N: TextNode, N1: TextNode>(first component: N) -> _EitherNode<N, N1> {
     .first(component)
   }
 
   @inlinable
-  public static func buildEither<N: TextNode, N1: TextNode>(second component: N1) -> EitherNode<N, N1> {
+  public static func buildEither<N: TextNode, N1: TextNode>(second component: N1) -> _EitherNode<N, N1> {
     .second(component)
   }
 
@@ -38,7 +41,8 @@ public enum TextBuilder {
 
 }
 
-public enum EitherNode<N: TextNode, N1: TextNode>: TextNode {
+// swiftlint:disable type_name
+public enum _EitherNode<N: TextNode, N1: TextNode>: TextNode {
   case first(N)
   case second(N1)
 
@@ -50,7 +54,7 @@ public enum EitherNode<N: TextNode, N1: TextNode>: TextNode {
   }
 }
 
-public struct NodeContainer: TextNode {
+public struct _NodeContainer: TextNode {
 
   @usableFromInline
   var nodes: [any TextNode]
@@ -58,7 +62,7 @@ public struct NodeContainer: TextNode {
   @usableFromInline
   init(nodes: [any TextNode]) {
     self.nodes = nodes.reduce(into: [any TextNode]()) { array, next in
-      if let many = next as? NodeContainer {
+      if let many = next as? _NodeContainer {
         array += many.nodes
       } else {
         array.append(next)
@@ -71,3 +75,5 @@ public struct NodeContainer: TextNode {
     nodes.reduce("") { $0 + $1.render() }
   }
 }
+
+// swiftlint:enable type_name
