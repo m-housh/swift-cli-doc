@@ -58,10 +58,10 @@ struct CliDocTests {
     \("Examples:".applyingStyle(.bold).applyingColor(.yellow)) \("Some common usage examples.".italic)
 
     \("First".red)
-    $ \("ls -lah".italic)
+    > \("ls -lah".italic)
 
     \("Second".red)
-    $ \("find . -name foo".italic)
+    > \("find . -name foo".italic)
     """
     let result = printIfNotEqual(
       examples.exampleStyle(CustomExampleOnlyStyle()).render(),
@@ -99,7 +99,7 @@ struct CustomExampleOnlyStyle: ExampleStyle {
       content.examples.map { example in
         VStack {
           example.label.red
-          ShellCommand { example.example }
+          ShellCommand(symbol: ">") { example.example }
         }
       }
     }

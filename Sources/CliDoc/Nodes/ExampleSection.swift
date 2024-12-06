@@ -1,7 +1,8 @@
 import Rainbow
 
+public typealias Example = (label: String, example: String)
+
 public struct ExampleSection<Header: TextNode, Label: TextNode>: TextNode {
-  public typealias Example = (label: String, example: String)
 
   @usableFromInline
   let configuration: ExampleSectionConfiguration
@@ -40,29 +41,26 @@ public struct ExampleSection<Header: TextNode, Label: TextNode>: TextNode {
 
 /// The type-erased configuration of an ``ExampleSection``
 public struct ExampleSectionConfiguration {
-  @usableFromInline
-  let title: any TextNode
+  public let title: any TextNode
+
+  public let label: any TextNode
+
+  public let examples: [Example]
 
   @usableFromInline
-  let label: any TextNode
-
-  @usableFromInline
-  let examples: [ExampleSection.Example]
-
-  @usableFromInline
-  init(title: any TextNode, label: any TextNode, examples: [ExampleSection.Example]) {
+  init(title: any TextNode, label: any TextNode, examples: [Example]) {
     self.title = title
     self.label = label
     self.examples = examples
   }
 }
 
+/// The configuration context for the `examples` of an ``ExampleSection``.
 public struct ExampleConfiguration {
-  @usableFromInline
-  let examples: [ExampleSection.Example]
+  public let examples: [Example]
 
   @usableFromInline
-  init(examples: [ExampleSection.Example]) {
+  init(examples: [Example]) {
     self.examples = examples
   }
 }
@@ -85,7 +83,7 @@ public extension ExampleSection {
   }
 }
 
-extension Array where Element == ExampleSection.Example {
+extension Array where Element == Example {
   @inlinable
   func exampleStyle<S: ExampleStyle>(_ style: S) -> some TextNode {
     style.render(content: .init(examples: self))
@@ -152,8 +150,8 @@ public struct DefaultExampleStyle: ExampleStyle {
     VStack(separator: .newLine(count: 2)) {
       content.examples.map { example in
         VStack {
-          Label(example.label.green.bold)
-          ShellCommand { example.example }.style(.default)
+          example.label.color(.green).bold()
+          ShellCommand(example.example).style(.default)
         }
       }
     }

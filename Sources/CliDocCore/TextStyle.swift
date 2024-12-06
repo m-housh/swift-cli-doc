@@ -62,8 +62,7 @@ public extension TextNode {
 public protocol TextStyle: TextModifier where Content == TextStyleConfiguration {}
 
 public struct TextStyleConfiguration {
-  @usableFromInline
-  let node: any TextNode
+  public let node: any TextNode
 
   @usableFromInline
   init(_ node: any TextNode) {

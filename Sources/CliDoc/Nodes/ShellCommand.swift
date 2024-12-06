@@ -1,20 +1,43 @@
+import CliDocCore
 import Rainbow
 
-public struct ShellCommand<Content: TextNode>: TextNode {
+/// Represents a shell command text node, with a symbol and the content of
+/// the command.  Used for displaying example shell commands.
+///
+///
+public struct ShellCommand<Content: TextNode, Symbol: TextNode>: TextNode {
 
   @usableFromInline
-  var symbol: any TextNode
+  let symbol: Symbol
 
   @usableFromInline
-  var content: Content
+  let content: Content
 
+  /// Create a new shell command with the given content and symbol.
+  ///
+  /// - Parameters:
+  ///   - content: The shell command to display.
+  ///   - symbol: The symbol to use in front of the shell command.
   @inlinable
   public init(
-    symbol: any TextNode = "$",
+    @TextBuilder content: () -> Content,
+    @TextBuilder symbol: () -> Symbol
+  ) {
+    self.symbol = symbol()
+    self.content = content()
+  }
+
+  /// Create a new shell command with the given content and symbol.
+  ///
+  /// - Parameters:
+  ///   - symbol: The symbol to use in front of the shell command.
+  ///   - content: The shell command to display.
+  @inlinable
+  public init(
+    symbol: @autoclosure () -> Symbol,
     @TextBuilder content: () -> Content
   ) {
-    self.symbol = symbol
-    self.content = content()
+    self.init(content: content, symbol: symbol)
   }
 
   @inlinable
@@ -23,22 +46,35 @@ public struct ShellCommand<Content: TextNode>: TextNode {
   }
 }
 
-public extension ShellCommand where Content == String {
+public extension ShellCommand where Content == String, Symbol == String {
+  /// Create a new shell command with the given content and symbol.
+  ///
+  /// - Parameters:
+  ///   - content: The shell command to display.
+  ///   - symbol: The symbol to use in front of the shell command.
   @inlinable
   init(
-    _ content: String,
-    symbol: any TextNode = "$"
+    _ content: @autoclosure () -> String,
+    symbol: @autoclosure () -> String = "$"
   ) {
-    self.init(symbol: symbol) { content }
+    self.init(content: content, symbol: symbol)
   }
 }
 
 public struct ShellCommandConfiguration {
-  let symbol: any TextNode
-  let content: any TextNode
+  public let symbol: any TextNode
+
+  public let content: any TextNode
+
+  @usableFromInline
+  init(symbol: any TextNode, content: any TextNode) {
+    self.symbol = symbol
+    self.content = content
+  }
 }
 
 public extension ShellCommand {
+  @inlinable
   func style<S: ShellCommandStyle>(_ style: S) -> some TextNode {
     style.render(content: .init(symbol: symbol, content: content))
   }
@@ -46,7 +82,7 @@ public extension ShellCommand {
 
 // MARK: - Style
 
-public protocol ShellCommandStyle: TextModifier where Self.Content == ShellCommandConfiguration {}
+public protocol ShellCommandStyle: TextModifier where Content == ShellCommandConfiguration {}
 
 public extension ShellCommandStyle where Self == DefaultShellCommandStyle {
   static var `default`: Self { DefaultShellCommandStyle() }
@@ -57,7 +93,7 @@ public struct DefaultShellCommandStyle: ShellCommandStyle {
   public func render(content: ShellCommandConfiguration) -> some TextNode {
     HStack {
       content.symbol
-      content.content.textStyle(.italic)
+      content.content.italic()
     }
   }
 }

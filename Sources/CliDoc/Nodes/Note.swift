@@ -1,3 +1,4 @@
+import CliDocCore
 import Rainbow
 
 public struct Note<Label: TextNode, Content: TextNode>: TextNode {
@@ -18,7 +19,7 @@ public struct Note<Label: TextNode, Content: TextNode>: TextNode {
 
   @inlinable
   public var body: some TextNode {
-    noteStyle(.default)
+    style(.default)
   }
 }
 
@@ -26,11 +27,10 @@ public extension Note where Label == String {
 
   @inlinable
   init(
-    _ label: String = "NOTE:",
+    _ label: @autoclosure () -> String = "NOTE:",
     @TextBuilder content: () -> Content
   ) {
-    self.label = label
-    self.content = content()
+    self.init(label, content: content)
   }
 
   static func important(
@@ -48,6 +48,7 @@ public extension Note where Label == String {
   }
 }
 
+// TODO: Remove the important and see also.
 public extension Note where Label == String, Content == String {
 
   @inlinable
@@ -74,28 +75,39 @@ public extension Note where Label == String, Content == String {
 }
 
 public struct NoteStyleConfiguration {
+  @usableFromInline
   let label: any TextNode
+
+  @usableFromInline
   let content: any TextNode
+
+  @usableFromInline
+  init(label: any TextNode, content: any TextNode) {
+    self.label = label
+    self.content = content
+  }
 }
 
 public extension Note {
-  func noteStyle<S: NoteStyleModifier>(_ modifier: S) -> some TextNode {
-    modifier.render(content: .init(label: label, content: content))
+  @inlinable
+  func style<S: NoteStyle>(_ modifier: S) -> some TextNode {
+    modifier.render(content: NoteStyleConfiguration(label: label, content: content))
   }
 }
 
 // MARK: - Style
 
-public protocol NoteStyleModifier: TextModifier where Content == NoteStyleConfiguration {}
+public protocol NoteStyle: TextModifier where Content == NoteStyleConfiguration {}
 
-public extension NoteStyleModifier where Self == DefaultNoteStyle {
+public extension NoteStyle where Self == DefaultNoteStyle {
   static var `default`: Self {
     DefaultNoteStyle()
   }
 }
 
-public struct DefaultNoteStyle: NoteStyleModifier {
+public struct DefaultNoteStyle: NoteStyle {
 
+  @inlinable
   public func render(content: NoteStyleConfiguration) -> some TextNode {
     HStack {
       content.label.color(.yellow).textStyle(.bold)

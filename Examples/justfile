@@ -1,0 +1,3 @@
+
+run command="section":
+  swift run examples {{command}}

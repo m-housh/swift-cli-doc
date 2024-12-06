@@ -1,4 +1,52 @@
-// TODO: Add vertical spacing.
+/// A section of text nodes, that can contain a header, content, and footer.
+///
+/// This allows nodes to be grouped and styled together.
+///
+/// **Example:**
+///
+/// ```swift
+/// let mySection = Section {
+///   "My super awesome section content"
+/// } header: {
+///   "Awesome"
+/// } footer: {
+///   "Note: this is super awesome".italic()
+/// }
+/// ```
+///
+/// **Styling Sections:**
+///
+/// You can style a section by creating a custom ``SectionStyle``, which gives you the
+/// opportunity to arrange and style the nodes within the section.
+///
+/// ```swift
+/// struct MySectionStyle: SectionStyle {
+///   func render(content: SectionConfiguration) -> some TextNode {
+///     VStack(separator: .newLine(count: 2)) {
+///       content.header
+///         .color(.green)
+///         .bold()
+///         .underline()
+///       content.content
+///       content.footer.italic()
+///     }
+///   }
+/// }
+///
+/// mySection.style(MySectionStyle())
+///
+/// print(mySection.render())
+/// ```
+/// **Note:** colored output / styling only shows in the terminal.
+///
+/// ```bash
+///
+/// Awesome
+///
+/// My super awesome section
+///
+/// Note: this is super awesome
+/// ```
 public struct Section<Header: TextNode, Content: TextNode, Footer: TextNode>: TextNode {
 
   @usableFromInline
@@ -10,6 +58,12 @@ public struct Section<Header: TextNode, Content: TextNode, Footer: TextNode>: Te
   @usableFromInline
   let footer: Footer
 
+  /// Create a new section with the given content, header, and footer.
+  ///
+  /// - Parameters:
+  ///   - content: The content of the section.
+  ///   - header: The header for the section.
+  ///   - footer: The footer for the section.
   @inlinable
   public init(
     @TextBuilder content: () -> Content,
@@ -27,6 +81,11 @@ public struct Section<Header: TextNode, Content: TextNode, Footer: TextNode>: Te
 }
 
 public extension Section where Footer == Empty {
+  /// Create a new section with the given content and header, with no footer.
+  ///
+  /// - Parameters:
+  ///   - content: The content of the section.
+  ///   - header: The header for the section.
   @inlinable
   init(
     @TextBuilder content: () -> Content,
@@ -37,6 +96,11 @@ public extension Section where Footer == Empty {
 }
 
 public extension Section where Header == Empty {
+  /// Create a new section with the given content and footer, with no header.
+  ///
+  /// - Parameters:
+  ///   - content: The content of the section.
+  ///   - footer: The footer for the section.
   @inlinable
   init(
     @TextBuilder content: () -> Content,
@@ -46,28 +110,29 @@ public extension Section where Header == Empty {
   }
 }
 
-public extension Section where Header == Empty, Footer == Empty {
-  @inlinable
-  init(
-    @TextBuilder content: () -> Content
-  ) {
-    self.init(content: content, header: { Empty() }, footer: { Empty() })
-  }
-}
-
 // MARK: - Style
 
 public extension Section {
 
+  /// Style a ``Section`` using the given ``SectionStyle``.
+  ///
+  /// - Parameters:
+  ///   - style: The section style to use.
   @inlinable
   func style<S: SectionStyle>(_ style: S) -> some TextNode {
     style.render(content: .init(header: header, content: content, footer: footer))
   }
 }
 
+/// Holds the type-erased values of a ``Section``, used to style a section.
 public struct SectionConfiguration {
+  /// The type-erased header of a section.
   public let header: any TextNode
+
+  /// The type-erased content of a section.
   public let content: any TextNode
+
+  /// The type-erased footer of a section.
   public let footer: any TextNode
 
   @usableFromInline
@@ -81,13 +146,33 @@ public struct SectionConfiguration {
 public protocol SectionStyle: TextModifier where Content == SectionConfiguration {}
 
 public extension SectionStyle where Self == DefaultSectionStyle {
-  static var `default`: Self { DefaultSectionStyle() }
+
+  /// Style a section using the default style, separating the content with
+  /// a new line between the elements.
+  static var `default`: Self { `default`(separator: .newLine(count: 2)) }
+
+  /// Style a section using the default style, separating the content with
+  /// given separator between the elements.
+  ///
+  /// - Parameters:
+  ///   - separator: The separator to use to separate elements in a section.
+  static func `default`(separator: Separator.Vertical) -> Self {
+    DefaultSectionStyle(separator: separator)
+  }
 }
 
+/// Represents the default ``SectionStyle``, which arranges the nodes in
+/// a ``VStack``, using the separator passed in.
+///
+/// - SeeAlso: ``SectionStyle/default(separator:)``
+///
 public struct DefaultSectionStyle: SectionStyle {
 
+  @usableFromInline
+  let separator: Separator.Vertical
+
   public func render(content: SectionConfiguration) -> some TextNode {
-    VStack(separator: .newLine(count: 2)) {
+    VStack(separator: separator) {
       content.header
       content.content
       content.footer
