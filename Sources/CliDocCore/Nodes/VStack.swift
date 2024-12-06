@@ -1,18 +1,21 @@
-public struct VStack: TextNode {
+/// A vertical stack of text nodes.
+///
+///
 
+public struct VStack: TextNode {
   @usableFromInline
   let content: [any TextNode]
 
   @usableFromInline
-  let separator: any TextNode
+  let separator: Separator.Vertical
 
   @inlinable
   public init(
-    spacing: Int = 1,
+    separator: Separator.Vertical = .newLine(count: 1),
     @TextBuilder content: () -> any TextNode
   ) {
     self.content = array(from: content())
-    self.separator = seperator("\n", count: spacing > 0 ? spacing - 1 : 0)
+    self.separator = separator
   }
 
   @inlinable

@@ -86,7 +86,7 @@ public extension Note {
 
 // MARK: - Style
 
-public protocol NoteStyleModifier: NodeModifier where Content == NoteStyleConfiguration {}
+public protocol NoteStyleModifier: TextModifier where Content == NoteStyleConfiguration {}
 
 public extension NoteStyleModifier where Self == DefaultNoteStyle {
   static var `default`: Self {

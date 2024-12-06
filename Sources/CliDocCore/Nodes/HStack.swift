@@ -1,18 +1,19 @@
+/// A horizontal group of text nodes.
 public struct HStack: TextNode {
 
   @usableFromInline
   let content: [any TextNode]
 
   @usableFromInline
-  let separator: any TextNode
+  let separator: Separator.Horizontal
 
   @inlinable
   public init(
-    spacing: Int = 1,
+    separator: Separator.Horizontal = .space(count: 1),
     @TextBuilder content: () -> any TextNode
   ) {
     self.content = array(from: content())
-    self.separator = seperator(" ", count: spacing > 0 ? spacing - 1 : 0)
+    self.separator = separator
   }
 
   @inlinable

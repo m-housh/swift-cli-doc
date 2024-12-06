@@ -69,8 +69,8 @@ public struct ExampleConfiguration {
 
 // MARK: - Style
 
-public protocol ExampleSectionStyle: NodeModifier where Content == ExampleSectionConfiguration {}
-public protocol ExampleStyle: NodeModifier where Content == ExampleConfiguration {}
+public protocol ExampleSectionStyle: TextModifier where Content == ExampleSectionConfiguration {}
+public protocol ExampleStyle: TextModifier where Content == ExampleConfiguration {}
 
 public extension ExampleSection {
 
@@ -149,7 +149,7 @@ public struct DefaultExampleStyle: ExampleStyle {
 
   @inlinable
   public func render(content: ExampleConfiguration) -> some TextNode {
-    VStack(spacing: 2) {
+    VStack(separator: .newLine(count: 2)) {
       content.examples.map { example in
         VStack {
           Label(example.label.green.bold)

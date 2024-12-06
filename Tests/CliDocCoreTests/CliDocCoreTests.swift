@@ -32,6 +32,18 @@ struct CliDocCoreTests {
       "bar"
     }
     #expect(stack.render() == "foo bar")
+
+    let tabStack = HStack(separator: .tab()) {
+      "foo"
+      "bar"
+    }
+    #expect(tabStack.render() == "foo\tbar")
+
+    let customStack = HStack(separator: .custom(":blob:")) {
+      "foo"
+      "bar"
+    }
+    #expect(customStack.render() == "foo:blob:bar")
   }
 
   @Test
@@ -44,6 +56,15 @@ struct CliDocCoreTests {
     #expect(stack.render() == """
     foo
     bar
+    """)
+
+    let customStack = VStack(separator: .custom("\n\t")) {
+      "foo"
+      "bar"
+    }
+    #expect(customStack.render() == """
+    foo
+    \tbar
     """)
   }
 
@@ -63,6 +84,73 @@ struct CliDocCoreTests {
     let array = ["foo", " ", "bar"]
     #expect(array.body.render() == "foo bar")
     #expect(array.render() == "foo bar")
+  }
+
+  @Test(arguments: [
+    Style.bold, .italic, .dim, .underline, .blink, .strikethrough
+  ])
+  func testTextStyles(style: Style) {
+    let node = Group { "foo" }.textStyle(StyledText(style))
+    let string = "foo".applyingStyle(style)
+    #expect(node.render() == string)
+  }
+
+  @Test
+  func testTextStylesDirectlyOnNode() {
+    let bold = Group { "foo" }.bold()
+    let string = "foo".bold
+    #expect(bold.render() == string)
+
+    let dim = Group { "foo" }.dim()
+    let dimString = "foo".dim
+    #expect(dim.render() == dimString)
+
+    let italic = Group { "foo" }.italic()
+    let italicString = "foo".italic
+    #expect(italic.render() == italicString)
+
+    let blink = Group { "foo" }.blink()
+    let blinkString = "foo".blink
+    #expect(blink.render() == blinkString)
+
+    let strikeThrough = Group { "foo" }.strikeThrough()
+    let strikeThroughString = "foo".applyingStyle(.strikethrough)
+    #expect(strikeThrough.render() == strikeThroughString)
+
+    let underline = Group { "foo" }.underline()
+    let underlineString = "foo".underline
+    #expect(underline.render() == underlineString)
+  }
+
+  @Test(arguments: NamedColor.allCases)
+  func testNamedColors(color: NamedColor) {
+    let foregroundNode = Group { "foo" }.color(color)
+    let string = "foo".applyingColor(color)
+    #expect(foregroundNode.render() == string)
+
+    let backgroundNode = Group { "foo" }.backgroundColor(color.toBackgroundColor)
+    let backgroundString = "foo".applyingBackgroundColor(color.toBackgroundColor)
+    #expect(backgroundNode.render() == backgroundString)
+  }
+
+  @Test
+  func testBit8Colors() {
+    let color: UInt8 = 32
+    let foregroundNode = Group { "foo" }.color(color)
+    let string = "foo".applyingColor(.bit8(color))
+    #expect(foregroundNode.render() == string)
+
+    let backgroundNode = Group { "foo" }.backgroundColor(color)
+    let backgroundString = "foo".applyingBackgroundColor(.bit8(color))
+    #expect(backgroundNode.render() == backgroundString)
+
+    let rgbNode = Group { "foo" }.color(color, color, color)
+    let rgbString = "foo".applyingColor(.bit24((color, color, color)))
+    #expect(rgbNode.render() == rgbString)
+
+    let rgbBackgroundNode = Group { "foo" }.backgroundColor(color, color, color)
+    let rgbBackgroundString = "foo".applyingBackgroundColor(.bit24((color, color, color)))
+    #expect(rgbBackgroundNode.render() == rgbBackgroundString)
   }
 
   @Test(

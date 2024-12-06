@@ -78,7 +78,7 @@ public struct SectionConfiguration {
   }
 }
 
-public protocol SectionStyle: NodeModifier where Content == SectionConfiguration {}
+public protocol SectionStyle: TextModifier where Content == SectionConfiguration {}
 
 public extension SectionStyle where Self == DefaultSectionStyle {
   static var `default`: Self { DefaultSectionStyle() }
@@ -87,7 +87,7 @@ public extension SectionStyle where Self == DefaultSectionStyle {
 public struct DefaultSectionStyle: SectionStyle {
 
   public func render(content: SectionConfiguration) -> some TextNode {
-    VStack(spacing: 2) {
+    VStack(separator: .newLine(count: 2)) {
       content.header
       content.content
       content.footer

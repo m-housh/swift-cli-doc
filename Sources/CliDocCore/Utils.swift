@@ -9,17 +9,6 @@ func array(from node: any TextNode) -> [any TextNode] {
   }
 }
 
-@usableFromInline
-func seperator(_ separator: String, count: Int) -> any TextNode {
-  assert(count >= 0, "Invalid count while creating a separator")
-
-  var output = ""
-  for _ in 0 ... count {
-    output += separator
-  }
-  return output
-}
-
 extension Array where Element == (any TextNode) {
 
   @usableFromInline

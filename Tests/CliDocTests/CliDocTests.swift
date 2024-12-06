@@ -95,7 +95,7 @@ extension ExampleSectionStyle where Self == DefaultExampleSectionStyle<CustomExa
 
 struct CustomExampleOnlyStyle: ExampleStyle {
   func render(content: ExampleConfiguration) -> some TextNode {
-    VStack(spacing: 2) {
+    VStack(separator: .newLine(count: 2)) {
       content.examples.map { example in
         VStack {
           example.label.red

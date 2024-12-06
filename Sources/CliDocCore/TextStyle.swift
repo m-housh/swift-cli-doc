@@ -13,14 +13,29 @@ public extension TextNode {
   }
 
   @inlinable
-  func color(red: UInt8, green: UInt8, blue: UInt8) -> some TextNode {
+  func color(_ red: UInt8, _ green: UInt8, _ blue: UInt8) -> some TextNode {
     textStyle(.color(rgb: (red, green, blue)))
+  }
+
+  @inlinable
+  func backgroundColor(_ name: NamedBackgroundColor) -> some TextNode {
+    textStyle(.backgroundColor(name))
+  }
+
+  @inlinable
+  func backgroundColor(_ bit8: UInt8) -> some TextNode {
+    textStyle(.backgroundColor(bit8: bit8))
+  }
+
+  @inlinable
+  func backgroundColor(_ red: UInt8, _ green: UInt8, _ blue: UInt8) -> some TextNode {
+    textStyle(.backgroundColor(rgb: (red, green, blue)))
   }
 
   @inlinable
   func textStyle<S: TextStyle>(_ styles: S...) -> some TextNode {
     styles.reduce(render()) { string, style in
-      style.render(content: string).render()
+      style.render(content: .init(string)).render()
     }
   }
 
@@ -44,10 +59,20 @@ public extension TextNode {
 
 }
 
-// TODO: Remove string restraint.
-public protocol TextStyle: NodeModifier where Content == String {}
+public protocol TextStyle: TextModifier where Content == TextStyleConfiguration {}
+
+public struct TextStyleConfiguration {
+  @usableFromInline
+  let node: any TextNode
+
+  @usableFromInline
+  init(_ node: any TextNode) {
+    self.node = node
+  }
+}
 
 public extension TextStyle where Self == StyledText {
+
   @inlinable
   static var bold: Self { .init(.bold) }
 
@@ -64,9 +89,6 @@ public extension TextStyle where Self == StyledText {
   static var blink: Self { .init(.blink) }
 
   @inlinable
-  static var swap: Self { .init(.swap) }
-
-  @inlinable
   static var strikeThrough: Self { .init(.strikethrough) }
 }
 
@@ -74,37 +96,58 @@ public extension TextStyle where Self == ColorTextStyle {
 
   @inlinable
   static func color(_ name: NamedColor) -> Self {
-    .init(.named(name))
+    .init(.foreground(.named(name)))
   }
 
   @inlinable
   static func color(bit8: UInt8) -> Self {
-    .init(.bit8(bit8))
+    .init(.foreground(.bit8(bit8)))
   }
 
   @inlinable
   static func color(rgb: RGB) -> Self {
-    .init(.bit24(rgb))
+    .init(.foreground(.bit24(rgb)))
+  }
+
+  @inlinable
+  static func backgroundColor(_ name: NamedBackgroundColor) -> Self {
+    .init(.background(.named(name)))
+  }
+
+  @inlinable
+  static func backgroundColor(bit8: UInt8) -> Self {
+    .init(.background(.bit8(bit8)))
+  }
+
+  @inlinable
+  static func backgroundColor(rgb: RGB) -> Self {
+    .init(.background(.bit24(rgb)))
   }
 }
 
 public struct ColorTextStyle: TextStyle {
-  enum Location {
+  @usableFromInline
+  enum Style {
     case foreground(ColorType)
-    case background(ColorType)
+    case background(BackgroundColorType)
   }
 
   @usableFromInline
-  let color: ColorType
+  let style: Style
 
   @usableFromInline
-  init(_ color: ColorType) {
-    self.color = color
+  init(_ style: Style) {
+    self.style = style
   }
 
   @inlinable
-  public func render(content: String) -> some TextNode {
-    content.applyingColor(color)
+  public func render(content: TextStyleConfiguration) -> some TextNode {
+    switch style {
+    case let .foreground(color):
+      return content.node.render().applyingColor(color)
+    case let .background(color):
+      return content.node.render().applyingBackgroundColor(color)
+    }
   }
 }
 
@@ -118,7 +161,7 @@ public struct StyledText: TextStyle {
   }
 
   @inlinable
-  public func render(content: String) -> some TextNode {
-    content.applyingStyle(style)
+  public func render(content: TextStyleConfiguration) -> some TextNode {
+    content.node.render().applyingStyle(style)
   }
 }

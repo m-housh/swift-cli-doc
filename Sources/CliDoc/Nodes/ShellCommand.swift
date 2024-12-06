@@ -46,7 +46,7 @@ public extension ShellCommand {
 
 // MARK: - Style
 
-public protocol ShellCommandStyle: NodeModifier where Self.Content == ShellCommandConfiguration {}
+public protocol ShellCommandStyle: TextModifier where Self.Content == ShellCommandConfiguration {}
 
 public extension ShellCommandStyle where Self == DefaultShellCommandStyle {
   static var `default`: Self { DefaultShellCommandStyle() }

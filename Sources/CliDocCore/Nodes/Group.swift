@@ -1,4 +1,9 @@
+/// A group of text nodes.
+///
+/// This allows you to group content together, which can optionally be
+/// styled.
 public struct Group<Content: TextNode>: TextNode {
+
   @usableFromInline
   var content: Content
 
