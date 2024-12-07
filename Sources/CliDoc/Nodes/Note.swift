@@ -1,6 +1,7 @@
 import CliDocCore
 import Rainbow
 
+// TODO: Use labeled content.
 public struct Note<Label: TextNode, Content: TextNode>: TextNode {
   @usableFromInline
   let label: Label

@@ -86,11 +86,30 @@ struct CliDocCoreTests {
     #expect(array.render() == "foo bar")
   }
 
+  @Test
+  func testLabeledContent() {
+    let horizontal = LabeledContent {
+      "Content"
+    } label: {
+      "Label:".color(.yellow).bold()
+    }
+
+    let expected = """
+    \("Label:".yellow.bold) Content
+    """
+    #expect(horizontal.render() == expected)
+
+    #expect(horizontal.style(.vertical()).render() == """
+    \("Label:".yellow.bold)
+    Content
+    """)
+  }
+
   @Test(arguments: [
     Style.bold, .italic, .dim, .underline, .blink, .strikethrough
   ])
   func testTextStyles(style: Style) {
-    let node = Group { "foo" }.textStyle(StyledText(style))
+    let node = Group { "foo" }.textStyle(_StyledText(style))
     let string = "foo".applyingStyle(style)
     #expect(node.render() == string)
   }
