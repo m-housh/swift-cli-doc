@@ -1,3 +1,4 @@
+docker_image_name := "clidoc"
 
 [private]
 default:
@@ -5,6 +6,15 @@ default:
 
 clean:
   @rm -rf .build
+
+test-docker: build-docker
+  @docker run -t --rm {{docker_image_name}}:test swift test
+
+build-docker:
+  @docker build \
+    --file docker/Dockerfile.test \
+    --tag {{docker_image_name}}:test \
+    .
 
 preview-documentation target="CliDoc":
   # using the --enable-experimental-combined-documentation doesn't work in previews currently.

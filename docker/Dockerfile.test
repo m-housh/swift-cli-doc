@@ -1,0 +1,8 @@
+ARG SWIFT_IMAGE_VERSION="6.0"
+FROM swift:${SWIFT_IMAGE_VERSION}
+WORKDIR /app
+COPY ./Package.* ./
+RUN swift package resolve
+COPY . .
+RUN swift build
+CMD ["/bin/bash", "-xc", "swift", "test"]
