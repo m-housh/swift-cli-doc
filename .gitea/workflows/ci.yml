@@ -11,18 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: https://git.housh.dev/actions/setup-just@371a7d824783e500d17e228a93e006ac49c29514
-#       - name: Setup MPR.
-#         run: |
-#           wget -qO - 'https://proget.makedeb.org/debian-feeds/prebuilt-mpr.pub' \
-#             | gpg --dearmor \
-#             | sudo tee /usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg 1> /dev/null \
-#           && echo "deb [arch=all,$(dpkg --print-architecture) signed-by=/usr/share/keyrings/prebuilt-mpr-archive-keyring.gpg] \
-#           https://proget.makedeb.org prebuilt-mpr $(lsb_release -cs)" \
-#           | sudo tee /etc/apt/sources.list.d/prebuilt-mpr.list \
-#           && sudo apt update
-#       - name: Setup just.
-#         run: sudo apt install -y just
+      - uses: https://git.housh.dev/actions/setup-just@v1
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
       - name: Setup Docker Buildx
