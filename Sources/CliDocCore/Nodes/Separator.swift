@@ -39,11 +39,11 @@ public enum Separator {
     public var body: some TextNode {
       switch self {
       case let .tab(count: count):
-        seperator("\t", count: count)
+        makeSeperator("\t", count: count)
       case let .space(count: count):
-        seperator(" ", count: count)
+        makeSeperator(" ", count: count)
       case let .custom(string, count: count):
-        seperator(string, count: count)
+        makeSeperator(string, count: count)
       }
     }
   }
@@ -85,14 +85,16 @@ public enum Separator {
     public var body: some TextNode {
       switch self {
       case let .newLine(count: count):
-        seperator("\n", count: count)
+        makeSeperator("\n", count: count)
       case let .custom(string, count: count):
-        seperator(string, count: count)
+        makeSeperator(string, count: count)
       }
     }
   }
 
 }
+
+// MARK: - Private Helpers.
 
 @usableFromInline
 func ensuredCount(_ count: Int) -> Int {
@@ -101,7 +103,7 @@ func ensuredCount(_ count: Int) -> Int {
 }
 
 @usableFromInline
-func seperator(_ separator: String, count: Int) -> some TextNode {
+func makeSeperator(_ separator: String, count: Int) -> some TextNode {
   let count = ensuredCount(count)
 
   assert(count >= 1, "Invalid count while creating a separator")

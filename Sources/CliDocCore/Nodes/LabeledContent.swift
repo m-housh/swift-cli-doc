@@ -9,6 +9,11 @@ public struct LabeledContent<Label: TextNode, Content: TextNode>: TextNode {
   @usableFromInline
   let content: Content
 
+  /// Create a new labeled content text node.
+  ///
+  /// - Parameters:
+  ///   - content: The content portion of the labeled content.
+  ///   - label: The label for the content.
   @inlinable
   public init(
     @TextBuilder _ content: () -> Content,
@@ -55,14 +60,27 @@ public struct LabeledContentConfiguration {
   }
 }
 
+// MARK: - Style
+
+/// Represents a style for ``LabeledContent``.
+///
+///
 public protocol LabeledContentStyle: TextModifier where Content == LabeledContentConfiguration {}
 
 public extension LabeledContentStyle where Self == HorizontalLabeledContentStyle {
 
+  /// The default labeled content style, which places the label
+  /// and content inline with a space as a separator.
+  ///
   static var `default`: Self {
     horizontal()
   }
 
+  /// A horizontal labeled content style, which places the label
+  /// and content inline with the given separator.
+  ///
+  /// - Parameters:
+  ///   - separator: The horizontal separator to use.
   @inlinable
   static func horizontal(separator: Separator.Horizontal = .space()) -> Self {
     HorizontalLabeledContentStyle(separator: separator)
@@ -70,13 +88,22 @@ public extension LabeledContentStyle where Self == HorizontalLabeledContentStyle
 }
 
 public extension LabeledContentStyle where Self == VerticalLabeledContentStyle {
-
+  /// A vertical labeled content style, which places the label
+  /// and content with the given vertical separator.
+  ///
+  /// - Parameters:
+  ///   - separator: The vertical separator to use.
   @inlinable
   static func vertical(separator: Separator.Vertical = .newLine()) -> Self {
     VerticalLabeledContentStyle(separator: separator)
   }
 }
 
+/// A labeled content style which places items inline based on a given
+/// horizontal separator.
+///
+/// - See Also: ``LabeledContentStyle/horizontal(separator:)``
+///
 public struct HorizontalLabeledContentStyle: LabeledContentStyle {
 
   @usableFromInline
@@ -88,13 +115,19 @@ public struct HorizontalLabeledContentStyle: LabeledContentStyle {
   }
 
   public func render(content: LabeledContentConfiguration) -> some TextNode {
-    HStack(separator: separator) {
+    HStack {
       content.label
       content.content
     }
+    .separator(separator)
   }
 }
 
+/// A labeled content style which places items based on a given
+/// vertical separator.
+///
+/// - See Also: ``LabeledContentStyle/vertical(separator:)``
+///
 public struct VerticalLabeledContentStyle: LabeledContentStyle {
 
   @usableFromInline
@@ -106,9 +139,10 @@ public struct VerticalLabeledContentStyle: LabeledContentStyle {
   }
 
   public func render(content: LabeledContentConfiguration) -> some TextNode {
-    VStack(separator: separator) {
+    VStack {
       content.label
       content.content
     }
+    .separator(separator)
   }
 }

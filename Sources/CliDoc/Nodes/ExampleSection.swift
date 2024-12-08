@@ -147,7 +147,7 @@ public struct DefaultExampleStyle: ExampleStyle {
 
   @inlinable
   public func render(content: ExampleConfiguration) -> some TextNode {
-    VStack(separator: .newLine(count: 2)) {
+    VStack {
       content.examples.map { example in
         VStack {
           example.label.color(.green).bold()
@@ -155,5 +155,6 @@ public struct DefaultExampleStyle: ExampleStyle {
         }
       }
     }
+    .separator(.newLine(count: 2))
   }
 }

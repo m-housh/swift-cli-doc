@@ -171,10 +171,11 @@ public struct DefaultSectionStyle: SectionStyle {
   let separator: Separator.Vertical
 
   public func render(content: SectionConfiguration) -> some TextNode {
-    VStack(separator: separator) {
+    VStack {
       content.header
       content.content
       content.footer
     }
+    .style(.separator(separator))
   }
 }

@@ -33,16 +33,20 @@ struct CliDocCoreTests {
     }
     #expect(stack.render() == "foo bar")
 
-    let tabStack = HStack(separator: .tab()) {
+    let tabStack = HStack {
       "foo"
       "bar"
     }
+    .separator(.tab())
+
     #expect(tabStack.render() == "foo\tbar")
 
-    let customStack = HStack(separator: .custom(":blob:")) {
+    let customStack = HStack {
       "foo"
       "bar"
     }
+    .separator(.custom(":blob:"))
+
     #expect(customStack.render() == "foo:blob:bar")
   }
 
@@ -58,10 +62,12 @@ struct CliDocCoreTests {
     bar
     """)
 
-    let customStack = VStack(separator: .custom("\n\t")) {
+    let customStack = VStack {
       "foo"
       "bar"
     }
+    .separator(.custom("\n\t"))
+
     #expect(customStack.render() == """
     foo
     \tbar

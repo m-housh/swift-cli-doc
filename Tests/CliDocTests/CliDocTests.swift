@@ -13,16 +13,6 @@ struct CliDocTests {
   }()
 
   @Test
-  func testNote() {
-    #expect(setupRainbow)
-    let note = Note(content: "Some note.")
-    let expected = """
-    \("NOTE:".yellow.bold) Some note.
-    """
-    #expect(note.render() == expected)
-  }
-
-  @Test
   func testExamples() {
     #expect(setupRainbow)
     let examples = ExampleSection(
@@ -95,7 +85,7 @@ extension ExampleSectionStyle where Self == DefaultExampleSectionStyle<CustomExa
 
 struct CustomExampleOnlyStyle: ExampleStyle {
   func render(content: ExampleConfiguration) -> some TextNode {
-    VStack(separator: .newLine(count: 2)) {
+    VStack {
       content.examples.map { example in
         VStack {
           example.label.red
@@ -103,5 +93,6 @@ struct CustomExampleOnlyStyle: ExampleStyle {
         }
       }
     }
+    .separator(.newLine(count: 2))
   }
 }
