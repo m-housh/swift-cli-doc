@@ -7,6 +7,9 @@ default:
 clean:
   @rm -rf .build
 
+snapshot command outputDir="./Sources/CliDocCore/Documentation.docc/Resources":
+  @just -f Examples/justfile snapshot {{command}} ".{{outputDir}}"
+
 test-docker: build-docker
   @docker run -t --rm {{docker_image_name}}:test swift test
 

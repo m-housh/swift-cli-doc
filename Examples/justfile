@@ -1,3 +1,12 @@
+executable_path := "./.build/release/examples"
 
-run command="section":
-  swift run examples {{command}}
+build:
+  @swift build -c release
+
+run command="section": build
+   @{{executable_path}} {{command}}
+
+snapshot command="section" outputDir="${PWD}": build
+  @freeze --execute "{{executable_path}} {{command}}" \
+    --output {{outputDir}}/"{{command}}.png" \
+    --width 500

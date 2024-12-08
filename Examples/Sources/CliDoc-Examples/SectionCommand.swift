@@ -21,10 +21,11 @@ struct SectionCommand: ParsableCommand {
 
 struct MySectionStyle: SectionStyle {
   func render(content: SectionConfiguration) -> some TextNode {
-    VStack(separator: .newLine(count: 2)) {
+    VStack {
       content.header.color(.green).bold().underline()
       content.content
       content.footer.italic()
     }
+    .separator(.newLine(count: 2))
   }
 }

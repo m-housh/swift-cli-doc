@@ -8,3 +8,5 @@ DerivedData/
 .netrc
 .nvim/*
 docs/*
+Examples/*.png
+./*.png

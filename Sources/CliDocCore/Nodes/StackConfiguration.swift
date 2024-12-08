@@ -5,6 +5,9 @@ public struct StackConfiguration {
   public let content: [any TextNode]
 }
 
+/// A helper type that removes empty text nodes, and applies a separtor between
+/// the array of text nodes.
+///
 @usableFromInline
 struct AnySeparatableStackNode<Separator: TextNode>: TextNode {
 

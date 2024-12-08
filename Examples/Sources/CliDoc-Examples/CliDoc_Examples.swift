@@ -7,7 +7,9 @@ struct Application: ParsableCommand {
     .init(
       commandName: "examples",
       subcommands: [
-        SectionCommand.self
+        SectionCommand.self,
+        VStackCommand.self,
+        HStackCommand.self
       ]
     )
   }
