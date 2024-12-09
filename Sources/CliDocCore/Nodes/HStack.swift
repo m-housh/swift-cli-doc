@@ -59,7 +59,7 @@ public extension HStack {
 /// Style a ``HStack`` by creating a type that conforms to ``HStackStyle`` and use the
 /// style by calling the ``HStack/style(_:)`` method on your instance.
 ///
-public protocol HStackStyle: TextModifier where Content == StackConfiguration {}
+public protocol HStackStyle: TextModifier where Content == _StackConfiguration {}
 
 public extension HStackStyle where Self == HStackSeparatorStyle {
   /// Apply the given separator on a ``HStack``.
@@ -88,7 +88,7 @@ public struct HStackSeparatorStyle: HStackStyle {
   }
 
   @inlinable
-  public func render(content: StackConfiguration) -> some TextNode {
+  public func render(content: _StackConfiguration) -> some TextNode {
     AnySeparatableStackNode(content: content, separator: separator)
   }
 }

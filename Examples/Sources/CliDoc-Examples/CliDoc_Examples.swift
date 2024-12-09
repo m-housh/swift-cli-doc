@@ -9,7 +9,8 @@ struct Application: ParsableCommand {
       subcommands: [
         SectionCommand.self,
         VStackCommand.self,
-        HStackCommand.self
+        HStackCommand.self,
+        GroupCommand.self
       ]
     )
   }

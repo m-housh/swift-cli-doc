@@ -1,9 +1,13 @@
+// swiftlint:disable type_name
 /// Represents the content of an ``HStack`` or a ``VStack``.
 ///
-///
-public struct StackConfiguration {
+/// This is an internal convenience type, but needs to remain public
+/// for protcol conformances to work properly.
+public struct _StackConfiguration {
   public let content: [any TextNode]
 }
+
+// swiftlint:enable type_name
 
 /// A helper type that removes empty text nodes, and applies a separtor between
 /// the array of text nodes.
@@ -18,7 +22,7 @@ struct AnySeparatableStackNode<Separator: TextNode>: TextNode {
   let separator: Separator
 
   @usableFromInline
-  init(content: StackConfiguration, separator: Separator) {
+  init(content: _StackConfiguration, separator: Separator) {
     self.content = content.content
     self.separator = separator
   }

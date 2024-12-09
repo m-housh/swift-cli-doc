@@ -62,7 +62,7 @@ public extension VStack {
 /// Style a ``VStack`` by creating a type that conforms to ``VStackStyle`` and use the
 /// style by calling the ``VStack/style(_:)`` method on your instance.
 ///
-public protocol VStackStyle: TextModifier where Content == StackConfiguration {}
+public protocol VStackStyle: TextModifier where Content == _StackConfiguration {}
 
 public extension VStackStyle where Self == VStackSeparatorStyle {
 
@@ -92,7 +92,7 @@ public struct VStackSeparatorStyle: VStackStyle {
   }
 
   @inlinable
-  public func render(content: StackConfiguration) -> some TextNode {
+  public func render(content: _StackConfiguration) -> some TextNode {
     AnySeparatableStackNode(content: content, separator: separator)
   }
 }

@@ -22,6 +22,26 @@ struct CliDocCoreTests {
       }
     }
     #expect(group.render() == "foobar\("baz".blue)")
+
+    let group2 = Group {
+      VStack {
+        "My headline."
+        "Some text."
+      }
+      "\n"
+      HStack {
+        "Foo"
+        "Bar"
+      }
+    }
+    .color(.green)
+
+    print(group2.render())
+    #expect(group2.render() == """
+    My headline.
+    Some text.
+    Foo Bar
+    """.green)
   }
 
   @Test
