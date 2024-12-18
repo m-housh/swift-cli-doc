@@ -4,6 +4,7 @@ import PackageDescription
 
 let package = Package(
   name: "swift-cli-doc",
+  platforms: [.macOS(.v10_15)],
   products: [
     .library(name: "CliDocCore", targets: ["CliDocCore"]),
     .library(name: "CliDoc", targets: ["CliDoc"])
